@@ -15,63 +15,42 @@ export class MyApp {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
-      this.initPushNotification();
+      this.pushsetup();
       splashScreen.hide();
     });
   }
 
-  initPushNotification() {
-    if (!this.platform.is('cordova')) {
-      console.warn("Push notifications not initialized. Cordova is not available - Run in physical device");
-      return;
-    }
+  pushsetup() {
     const options: PushOptions = {
-      android: {
-        senderID: "YOUR_SENDER_ID" //´poner mi sender ID ACA LCDTM
-      },
-      ios: {
-        alert: "true",
-        badge: false,
-        sound: "true"
-      },
-      windows: {}
-    };
-    const pushObject: PushObject = this.push.init(options);
-
-    pushObject.on('registration').subscribe((data: any) => {
-      console.log("device token ->", data.registrationId);
-      //TODO - send device token to server
-    });
-
-    pushObject.on('notification').subscribe((data: any) => {
-      console.log('message', data.message);
-      //if user using app and push notification comes
-      if (data.additionalData.foreground) {
-        // if application open, show popup
-        let confirmAlert = this.alertCtrl.create({
-          title: 'New Notification',
-          message: data.message,
-          buttons: [{
-            text: 'Ignore',
-            role: 'cancel'
-          }, {
-            text: 'View',
-            handler: () => {
-              //TODO: Your logic here
-              //this.nav.push(DetailsPage, {message: data.message});
-            }
-          }]
-        });
-        confirmAlert.present();
-      } else {
-        //if user NOT using app and push notification comes
-        //TODO: Your logic on click of push notification directly
-        //this.nav.push(DetailsPage, {message: data.message});
-        console.log("Push notification clicked");
-      }
-    });
-
-    pushObject.on('error').subscribe(error => console.error('Error with Push plugin', error));
+     android: {
+         senderID: '935629396134',
+         sound: 'default'
+     },
+     ios: {
+         alert: 'true',
+         badge: true,
+         sound: 'false'
+     },
+     windows: {}
+  };
+ 
+  const pushObject: PushObject = this.push.init(options);
+ 
+  pushObject.on('notification').subscribe((notification: any) => {
+    if (notification.additionalData.foreground) {
+      let youralert = this.alertCtrl.create({
+        title: 'New Push notification',
+        message: notification.message
+      });
+      youralert.present();
+    }
+  });
+ 
+  pushObject.on('registration').subscribe((registration: any) => {
+     //do whatever you want with the registration ID
+  });
+ 
+  pushObject.on('error').subscribe(error => alert('Error with Push plugin' + error));
   }
 }
 
